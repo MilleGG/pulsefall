@@ -2,6 +2,8 @@
 
 **Every track is born the moment you press play.**
 
+### ▶ [Play it now](https://pulsefall-production.up.railway.app) — sound on 🔊
+
 A 4-lane rhythm game with no audio files. The music — synthwave kicks, snares, basslines, pads, and lead melodies — is composed and synthesized **live in your browser** with the Web Audio API. The beatmap is derived from the same generated score, so every note you hit is perfectly synced to the sound by construction.
 
 ![PULSEFALL gameplay](screenshot.png)

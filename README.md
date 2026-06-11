@@ -27,6 +27,16 @@ A 4-lane rhythm game with no audio files. The music — synthwave kicks, snares,
 
 Every classic is an **original arrangement of a public-domain composition** — melodies transcribed from scores whose composers died over a century ago, drums and 808s composed in-house, zero recordings sampled. Fully legal, instantly recognizable.
 
+**The Bangers — original tracks in modern pop styles:**
+
+| Track | BPM | Style |
+|---|---|---|
+| Hyperglow | 150 | hyperpop / bubblegum bass |
+| Venom | 143 | dark Y2K pop, chromatic staccato |
+| Nightswim | 138 | sped-up melodic club — the bassline is the hook |
+
+These are original compositions written for the game in the style of modern pop — genre and vibe aren't copyrightable, melodies are, so the melodies are ours.
+
 **The Synthetics — procedurally composed:**
 
 | Track | BPM | Mood |

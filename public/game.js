@@ -558,6 +558,21 @@ const DRUM_KITS = {
     full:  { kick: [0, 10], snare: [4, 12], hat: [0, 2, 4, 6, 8, 10, 12, 14], ohat: [] },
     max:   { kick: [0, 6, 10], snare: [4, 12], hat: [0, 2, 4, 6, 8, 9, 10, 12, 14], ohat: [12] },
   },
+  hyper: {
+    light: { kick: [0, 8], snare: [], hat: [2, 6, 10, 14], ohat: [] },
+    full:  { kick: [0, 4, 8, 12], snare: [4, 12], hat: [0, 2, 4, 6, 8, 10, 12, 14], ohat: [14] },
+    max:   { kick: [0, 4, 8, 12], snare: [4, 12], hat: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], ohat: [6, 14] },
+  },
+  y2k: {
+    light: { kick: [0, 10], snare: [], hat: [0, 4, 8, 12], ohat: [] },
+    full:  { kick: [0, 7, 10], snare: [4, 12], hat: [0, 2, 3, 4, 6, 8, 10, 11, 12, 14], ohat: [] },
+    max:   { kick: [0, 7, 10, 13], snare: [4, 12], hat: [0, 2, 3, 4, 6, 8, 10, 11, 12, 14, 15], ohat: [12] },
+  },
+  house: {
+    light: { kick: [0, 4, 8, 12], snare: [], hat: [2, 6, 10, 14], ohat: [] },
+    full:  { kick: [0, 4, 8, 12], snare: [4, 12], hat: [], ohat: [2, 6, 10, 14] },
+    max:   { kick: [0, 4, 8, 12], snare: [4, 12], hat: [0, 2, 4, 6, 8, 10, 12, 14], ohat: [2, 6, 10, 14] },
+  },
 };
 
 // Für Elise — main theme, A section (8 bars, 16th-step grid)
@@ -613,6 +628,74 @@ const MEL_ENT_BR = [
 const ENT_ROOTS_A = [-9, -9, -14, -14, -9, -9, -14, -9];
 const ENT_STABS_A = [[15, 19, 22], [15, 19, 22], [10, 14, 17], [10, 14, 17], [15, 19, 22], [15, 19, 22], [10, 14, 17], [15, 19, 22]];
 
+// HYPERGLOW — original hyperpop hook in E major (150 BPM)
+const MEL_HG_A = [
+  [0, 19, 2], [4, 23, 2], [8, 26, 3], [12, 23, 2],
+  [16, 21, 2], [20, 19, 2], [24, 21, 4],
+  [32, 19, 2], [36, 23, 2], [40, 26, 3], [44, 28, 2],
+  [48, 26, 2], [52, 23, 2], [56, 26, 4],
+  [64, 19, 2], [68, 23, 2], [72, 26, 3], [76, 23, 2],
+  [80, 21, 2], [84, 19, 2], [88, 16, 4],
+  [96, 14, 2], [100, 16, 2], [104, 19, 3], [108, 21, 2], [112, 23, 2], [116, 26, 2], [120, 28, 4],
+];
+const MEL_HG_B = [
+  [0, 31], [2, 28], [4, 26], [6, 28], [8, 31, 2], [12, 33, 2],
+  [16, 31], [18, 28], [20, 26], [22, 23], [24, 26, 4],
+  [32, 31], [34, 28], [36, 26], [38, 28], [40, 31, 2], [44, 35, 2],
+  [48, 33], [50, 31], [52, 28], [54, 31], [56, 33, 4],
+  [64, 31], [66, 28], [68, 26], [70, 28], [72, 31, 2], [76, 33, 2],
+  [80, 31], [82, 28], [84, 26], [86, 23], [88, 26, 4],
+  [96, 28], [98, 26], [100, 28], [102, 31, 2], [106, 33, 2], [110, 35, 2],
+  [112, 31, 6],
+];
+const MEL_HG_BR = [
+  [0, 23, 4], [8, 26, 4], [16, 28, 4], [24, 26, 4],
+  [32, 23, 4], [40, 21, 4], [48, 19, 6],
+];
+const ROOTS_HG = [-5, -10, -8, -12];
+const STABS_HG = [[19, 23, 26], [14, 18, 21], [16, 19, 23], [12, 16, 19]];
+
+// VENOM — original dark Y2K pop in D minor (143 BPM)
+const MEL_VN_A = [
+  [0, 17, 1], [2, 18, 1], [4, 17, 1], [6, 13, 2], [10, 12, 3],
+  [16, 17, 1], [18, 18, 1], [20, 17, 1], [22, 20, 2], [26, 17, 3],
+  [32, 22, 1], [34, 20, 1], [36, 22, 1], [38, 25, 2], [42, 24, 3],
+  [48, 22, 1], [50, 20, 1], [52, 19, 1], [54, 20, 2], [58, 17, 3],
+  [64, 17, 1], [66, 18, 1], [68, 17, 1], [70, 13, 2], [74, 12, 3],
+  [80, 17, 1], [82, 18, 1], [84, 17, 1], [86, 20, 2], [90, 17, 3],
+  [96, 22, 1], [98, 20, 1], [100, 22, 1], [102, 25, 2], [106, 24, 3],
+  [112, 13, 1], [114, 15, 1], [116, 17, 1], [118, 18, 1], [120, 17, 4],
+];
+const MEL_VN_B = [
+  [0, 29, 2], [4, 27, 2], [8, 25, 2], [12, 27, 2], [16, 29, 2], [20, 28, 2], [24, 29, 4],
+  [32, 25, 2], [36, 27, 2], [40, 29, 2], [44, 32, 2], [48, 29, 2], [52, 27, 2], [56, 25, 4],
+  [64, 29, 2], [68, 27, 2], [72, 25, 2], [76, 27, 2], [80, 29, 2], [84, 28, 2], [88, 29, 4],
+  [96, 25, 2], [100, 27, 2], [104, 29, 2], [108, 28, 2], [112, 29, 6],
+];
+const MEL_VN_BR = [
+  [0, 12, 3], [8, 13, 3], [16, 15, 3], [24, 17, 3],
+  [32, 18, 2], [36, 17, 2], [40, 15, 2], [44, 13, 2], [48, 12, 8],
+];
+const ROOTS_VN = [-7, -11, -9, -12];
+const STABS_VN = [[17, 20, 24], [13, 17, 20], [15, 19, 22], [12, 16, 19]];
+
+// NIGHTSWIM — original melodic-bassline club hook in A minor (138 BPM)
+const MEL_NS_A = [
+  [0, 0, 3], [6, 7, 2], [10, 5, 2], [14, 3, 2],
+  [16, 0, 3], [22, 7, 2], [26, 10, 2], [30, 12, 2],
+  [32, 12, 3], [38, 10, 2], [42, 7, 2], [46, 5, 2],
+  [48, 3, 3], [54, 5, 2], [58, 7, 4],
+  [64, 0, 3], [70, 7, 2], [74, 5, 2], [78, 3, 2],
+  [80, 0, 3], [86, 7, 2], [90, 10, 2], [94, 12, 2],
+  [96, 15, 3], [102, 12, 2], [106, 10, 2], [110, 7, 2],
+  [112, 5, 3], [118, 7, 2], [122, 3, 4],
+];
+const MEL_NS_BR = [
+  [0, 12, 4], [8, 10, 4], [16, 7, 4], [24, 5, 4],
+  [32, 3, 4], [40, 5, 4], [48, 7, 8],
+];
+const STABS_NS = [[12, 15, 19], [8, 12, 15], [15, 19, 22], [10, 14, 17]];
+
 const SONGS = {
   furelise: {
     bpm: 90, style: 'boombap', swing: 0.16, melVoice: 'keys', crackle: true,
@@ -647,6 +730,39 @@ const SONGS = {
       { name: 'outro', bars: 2, drums: 'light', roots: [-9] },
     ],
   },
+  hyperglow: {
+    bpm: 150, style: 'hyper', swing: 0, melVoice: 'lead', crackle: false,
+    sections: [
+      { name: 'intro', bars: 2, drums: 'light', roots: ROOTS_HG, stabs: STABS_HG },
+      { name: 'verse', bars: 8, drums: 'full', mel: MEL_HG_A, roots: ROOTS_HG, stabs: STABS_HG },
+      { name: 'chorus', bars: 8, drums: 'max', mel: MEL_HG_B, roots: ROOTS_HG, stabs: STABS_HG },
+      { name: 'bridge', bars: 4, drums: 'light', mel: MEL_HG_BR, roots: [-5, -10, -8, -12] },
+      { name: 'chorus', bars: 8, drums: 'max', mel: MEL_HG_B, roots: ROOTS_HG, stabs: STABS_HG },
+      { name: 'outro', bars: 2, drums: 'light', roots: ROOTS_HG },
+    ],
+  },
+  venom: {
+    bpm: 143, style: 'y2k', swing: 0.06, melVoice: 'keys', crackle: false,
+    sections: [
+      { name: 'intro', bars: 2, drums: 'light', roots: [-7] },
+      { name: 'verse', bars: 8, drums: 'full', mel: MEL_VN_A, roots: ROOTS_VN, stabs: STABS_VN },
+      { name: 'chorus', bars: 8, drums: 'max', mel: MEL_VN_B, voice: 'lead', roots: ROOTS_VN, stabs: STABS_VN },
+      { name: 'bridge', bars: 4, drums: 'light', mel: MEL_VN_BR, roots: [-7] },
+      { name: 'chorus', bars: 8, drums: 'max', mel: MEL_VN_B, voice: 'lead', roots: ROOTS_VN, stabs: STABS_VN },
+      { name: 'outro', bars: 2, drums: 'light', roots: [-7] },
+    ],
+  },
+  nightswim: {
+    bpm: 138, style: 'house', swing: 0, melVoice: 'lead', crackle: false,
+    sections: [
+      { name: 'intro', bars: 2, drums: 'light', roots: [-12] },
+      { name: 'verse', bars: 8, drums: 'full', mel: MEL_NS_A },
+      { name: 'chorus', bars: 8, drums: 'max', mel: MEL_NS_A, stabs: STABS_NS },
+      { name: 'bridge', bars: 4, drums: 'light', mel: MEL_NS_BR, roots: [-12] },
+      { name: 'chorus', bars: 8, drums: 'max', mel: MEL_NS_A, stabs: STABS_NS },
+      { name: 'outro', bars: 2, drums: 'light', roots: [-12] },
+    ],
+  },
 };
 
 function expandSong(cfg) {
@@ -664,11 +780,12 @@ function expandSong(cfg) {
     const base = bar * 16;
     const tr = sec.transpose || 0;
     if (sec.mel) {
+      const voice = sec.voice || def.melVoice;
       for (const m of sec.mel) {
         const s = m[0], semi = m[1] + tr, durSteps = m[2] || 2;
         const t = tOf(base + s);
         const dur = Math.max(step * 1.6, durSteps * step * 0.95);
-        events.push({ t, fn: def.melVoice, freq: F(semi), dur, v: def.melVoice === 'lead' ? 1.1 : 1 });
+        events.push({ t, fn: voice, freq: F(semi), dur, v: voice === 'lead' ? 1.1 : 1 });
         cands.push({ t, kind: 'mel', pitch: semi, si: s % 16 });
       }
     }
@@ -695,7 +812,7 @@ function expandSong(cfg) {
       }
       if (sec.stabs) {
         const ch = sec.stabs[b % sec.stabs.length];
-        if (def.style === 'trap') {
+        if (def.style === 'trap' || def.style === 'house') {
           events.push({ t: tOf(bs), fn: 'pad', freqs: ch.map(s => F(s)), dur: 16 * step, v: 0.85 });
         } else {
           for (const s of [0, 10]) {
@@ -725,6 +842,9 @@ const TRACKS = [
   { id: 'furelise', name: 'FÜR ELISE', bpm: 90, seed: 'pf-furelise-v1', song: 'furelise', tag: 'BOOM BAP · 1810', color: '#ffd166' },
   { id: 'mountainking', name: 'MOUNTAIN KING', bpm: 140, seed: 'pf-mountainking-v1', song: 'mountainking', tag: 'TRAP · 1875', color: '#ff4da6' },
   { id: 'entertainer', name: 'THE ENTERTAINER', bpm: 92, seed: 'pf-entertainer-v1', song: 'entertainer', tag: 'OLD SCHOOL · 1902', color: '#4df3ff' },
+  { id: 'hyperglow', name: 'HYPERGLOW', bpm: 150, seed: 'pf-hyperglow-v1', song: 'hyperglow', tag: 'HYPERPOP', color: '#ff4da6' },
+  { id: 'venom', name: 'VENOM', bpm: 143, seed: 'pf-venom-v1', song: 'venom', tag: 'Y2K POP', color: '#b44dff' },
+  { id: 'nightswim', name: 'NIGHTSWIM', bpm: 138, seed: 'pf-nightswim-v1', song: 'nightswim', tag: 'SPED UP CLUB', color: '#4df3ff' },
   { id: 'neon', name: 'NEON RUNNER', bpm: 122, seed: 'pf-neon-runner-v1', style: 'drive', tag: 'SYNTHWAVE', color: '#b44dff' },
   { id: 'midnight', name: 'MIDNIGHT DRIVE', bpm: 100, seed: 'pf-midnight-drive-v1', style: 'chill', tag: 'SYNTHWAVE', color: '#4df3ff' },
   { id: 'overdrive', name: 'OVERDRIVE', bpm: 146, seed: 'pf-overdrive-v1', style: 'intense', tag: 'SYNTHWAVE', color: '#ff4da6' },

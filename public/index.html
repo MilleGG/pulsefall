@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>PULSEFALL — every track is born when you press play</title>
+  <meta name="description" content="A rhythm game with no audio files: every track is synthesized live in your browser, and the beatmap IS the score. Perfect sync, infinite music." />
+  <meta name="theme-color" content="#0a0618" />
+  <meta property="og:title" content="PULSEFALL" />
+  <meta property="og:description" content="A rhythm game where the music is born the moment you press play. Synthesized live, perfectly synced. Hit the Daily Track and share your grade." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎹</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=1" />
+</head>
+<body>
+  <div id="game">
+    <canvas id="c"></canvas>
+
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+      <div id="progress"><div id="progressFill"></div></div>
+      <div id="scoreBox">
+        <div id="score">0</div>
+        <div id="acc">100.0%</div>
+      </div>
+      <button id="pauseBtn" aria-label="pause">II</button>
+    </div>
+
+    <button id="muteBtn" aria-label="toggle sound" class="hidden">♪</button>
+
+    <!-- MENU -->
+    <div id="menu" class="overlay">
+      <div class="panel">
+        <div id="title">PULSE<span>FALL</span></div>
+        <div id="tagline">every track is born the moment you press play</div>
+
+        <div id="trackGrid"></div>
+
+        <div id="diffRow">
+          <button class="diff" data-diff="easy">EASY</button>
+          <button class="diff sel" data-diff="normal">NORMAL</button>
+          <button class="diff" data-diff="hard">HARD</button>
+        </div>
+
+        <button id="playBtn" class="btn primary">PLAY</button>
+        <div class="menu-foot">
+          <button id="calibBtn" class="btn small">CALIBRATE ±<span id="offsetMs">0</span>ms</button>
+        </div>
+        <div id="bestLine"></div>
+        <div id="keysHint">D F J K &nbsp;·&nbsp; arrows &nbsp;·&nbsp; or tap the lanes</div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results" class="overlay hidden">
+      <div class="panel">
+        <div id="resTrack">NEON RUNNER · NORMAL</div>
+        <div id="grade">S</div>
+        <div id="resAcc">98.2%</div>
+        <div id="newBest" class="hidden">NEW BEST</div>
+        <div class="judges">
+          <div class="j"><div class="j-num jp" id="nPerfect">0</div><div class="j-label">perfect</div></div>
+          <div class="j"><div class="j-num jg" id="nGreat">0</div><div class="j-label">great</div></div>
+          <div class="j"><div class="j-num jo" id="nGood">0</div><div class="j-label">good</div></div>
+          <div class="j"><div class="j-num jm" id="nMiss">0</div><div class="j-label">miss</div></div>
+        </div>
+        <div class="stats-row">
+          <div class="stat"><div class="stat-num" id="resScore">0</div><div class="stat-label">score</div></div>
+          <div class="stat"><div class="stat-num" id="resCombo">0</div><div class="stat-label">max combo</div></div>
+        </div>
+        <button id="retryBtn" class="btn primary">PLAY AGAIN</button>
+        <div class="btn-row">
+          <button id="shareBtn" class="btn">SHARE</button>
+          <button id="menuBtn" class="btn">MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAUSE -->
+    <div id="pause" class="overlay hidden">
+      <div class="panel">
+        <div class="over-head">PAUSED</div>
+        <button id="resumeBtn" class="btn primary">RESUME</button>
+        <button id="quitBtn" class="btn">QUIT TO MENU</button>
+      </div>
+    </div>
+
+    <!-- CALIBRATION -->
+    <div id="calib" class="overlay hidden">
+      <div class="panel">
+        <div class="over-head">CALIBRATION</div>
+        <div id="calibText">Tap <b>any key</b> (or the screen) exactly on each beat.<br/>8 taps to lock in your latency.</div>
+        <div id="calibCount">—</div>
+        <div id="calibResult"></div>
+        <button id="calibStart" class="btn primary">START</button>
+        <button id="calibCancel" class="btn">BACK</button>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+  </div>
+
+  <script src="game.js?v=1"></script>
+</body>
+</html>

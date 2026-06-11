@@ -235,6 +235,62 @@ const AC = {
       }
     }
   },
+  sub(when, freq, dur, v = 1) {
+    // 808-style sub: sine with a fast pitch drop and long decay
+    const o = this.ctx.createOscillator();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(freq * 2.2, when);
+    o.frequency.exponentialRampToValueAtTime(freq, when + 0.045);
+    o.connect(this.env(when, 0.5 * v, 0.005, dur));
+    o.start(when); o.stop(when + dur + 0.05);
+  },
+  keys(when, freq, dur, v = 1) {
+    // warm lo-fi keys pluck
+    const g = this.env(when, 0.26 * v, 0.008, dur, 0.001);
+    for (const det of [-4, 3]) {
+      const o = this.ctx.createOscillator();
+      o.type = 'triangle';
+      o.frequency.value = freq;
+      o.detune.value = det;
+      const lp = this.ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(2100, when);
+      lp.frequency.exponentialRampToValueAtTime(750, when + dur);
+      o.connect(lp); lp.connect(g);
+      o.start(when); o.stop(when + dur + 0.05);
+    }
+    const send = this.ctx.createGain();
+    send.gain.value = 0.22;
+    g.connect(send); send.connect(this.delay);
+  },
+  crackleStart() {
+    // looped vinyl crackle bed for the lo-fi tracks
+    if (!this.ctx) return null;
+    if (!this.crackleBuf) {
+      const len = this.ctx.sampleRate * 3;
+      this.crackleBuf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+      const d = this.crackleBuf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * 0.012;
+      for (let p = 0; p < 70; p++) {
+        const at = Math.floor(Math.random() * (len - 200));
+        const amp = 0.08 + Math.random() * 0.3;
+        for (let k = 0; k < 120; k++) d[at + k] += (Math.random() * 2 - 1) * amp * Math.exp(-k / 18);
+      }
+    }
+    const src = this.ctx.createBufferSource();
+    src.buffer = this.crackleBuf;
+    src.loop = true;
+    const lp = this.ctx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 4200;
+    const g = this.ctx.createGain();
+    g.gain.value = 0.5;
+    src.connect(lp); lp.connect(g); g.connect(this.master);
+    src.start();
+    return src;
+  },
+  crackleStop(src) {
+    if (src) { try { src.stop(); } catch (e) {} }
+  },
   tick(when, accent = false) {
     const o = this.ctx.createOscillator();
     o.type = 'sine';
@@ -482,11 +538,196 @@ function makeBeatmap(track, diff, seedStr) {
   return notes;
 }
 
+// ============================================================ arranged songs (public-domain compositions, original hip-hop arrangements)
+// All melodies transcribed from PD scores: Beethoven (1810), Grieg (1875), Joplin (1902).
+// Semitones are absolute offsets from A2 (110 Hz).
+
+const DRUM_KITS = {
+  boombap: {
+    light: { kick: [0, 10], snare: [], hat: [0, 4, 8, 12], ohat: [] },
+    full:  { kick: [0, 7, 10], snare: [4, 12], hat: [0, 2, 4, 6, 8, 10, 12, 14], ohat: [] },
+    max:   { kick: [0, 7, 10], snare: [4, 12], hat: [0, 2, 4, 6, 8, 10, 11, 12, 14], ohat: [14] },
+  },
+  trap: {
+    light: { kick: [0], snare: [], hat: [0, 2, 4, 6, 8, 10, 12, 14], ohat: [] },
+    full:  { kick: [0, 6, 10], snare: [8], hat: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], ohat: [] },
+    max:   { kick: [0, 6, 10, 13], snare: [8], hat: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], ohat: [4] },
+  },
+  oldschool: {
+    light: { kick: [0, 10], snare: [], hat: [0, 4, 8, 12], ohat: [] },
+    full:  { kick: [0, 10], snare: [4, 12], hat: [0, 2, 4, 6, 8, 10, 12, 14], ohat: [] },
+    max:   { kick: [0, 6, 10], snare: [4, 12], hat: [0, 2, 4, 6, 8, 9, 10, 12, 14], ohat: [12] },
+  },
+};
+
+// Für Elise — main theme, A section (8 bars, 16th-step grid)
+const MEL_FE_A = [
+  [0, 31], [2, 30], [4, 31], [6, 30], [8, 31], [10, 26], [12, 29], [14, 27],
+  [16, 24, 4], [24, 15], [26, 19], [28, 24],
+  [32, 26, 4], [40, 19], [42, 23], [44, 26],
+  [48, 27, 4], [56, 19], [58, 31], [60, 30],
+  [64, 31], [66, 30], [68, 31], [70, 30], [72, 31], [74, 26], [76, 29], [78, 27],
+  [80, 24, 4], [88, 15], [90, 19], [92, 24],
+  [96, 26, 4], [104, 29], [106, 27], [108, 26],
+  [112, 24, 8],
+];
+const MEL_FE_BR = [
+  [0, 0, 2], [4, 3, 2], [8, 7, 2], [12, 12, 2],
+  [16, 12, 2], [20, 7, 2], [24, 3, 2], [28, 0, 2],
+  [32, -5, 2], [36, -1, 2], [40, 2, 2], [44, 7, 2],
+  [48, 7, 2], [52, 2, 2], [56, -1, 2], [60, -5, 2],
+];
+const FE_ROOTS_A = [-12, -12, -17, -12, -12, -12, -17, -12];
+const FE_STABS_A = [[12, 15, 19], [12, 15, 19], [11, 14, 19], [12, 15, 19], [12, 15, 19], [12, 15, 19], [11, 14, 19], [12, 15, 19]];
+
+// In the Hall of the Mountain King — theme (transposed to A minor), 8 bars
+const MEL_MK_A = [
+  [0, 0], [2, 2], [4, 3], [6, 5], [8, 7], [10, 3], [12, 7, 4],
+  [16, 0], [18, 2], [20, 3], [22, 5], [24, 7], [26, 3], [28, 7, 4],
+  [32, 6], [34, 2], [36, 6, 4],
+  [48, 5], [50, 1], [52, 5, 4],
+  [64, 0], [66, 2], [68, 3], [70, 5], [72, 7], [74, 3], [76, 7, 4],
+  [80, 0], [82, 2], [84, 3], [86, 5], [88, 7], [90, 3], [92, 7, 4],
+  [96, 12], [98, 10], [100, 7], [102, 3], [104, 7], [106, 10],
+  [112, 12, 6],
+];
+const MEL_MK_HALF = MEL_MK_A.slice(0, 14); // first two phrases only (for the break)
+const MK_ROOTS_A = [-12, -12, -6, -7, -12, -12, -12, -12];
+
+// The Entertainer — opening strain (8 bars)
+const MEL_ENT_A = [
+  [0, 17], [1, 18], [2, 19], [3, 27, 2], [5, 19], [6, 27, 2], [8, 19], [9, 27, 4],
+  [16, 17], [17, 18], [18, 19], [19, 27, 2], [21, 19], [22, 27, 2], [24, 19], [25, 27, 4],
+  [32, 27], [33, 29], [34, 30], [35, 31], [36, 27], [37, 29], [38, 31, 2], [40, 26], [42, 29], [44, 27, 4],
+  [64, 17], [65, 18], [66, 19], [67, 27, 2], [69, 19], [70, 27, 2], [72, 19], [73, 27, 4],
+  [80, 17], [81, 18], [82, 19], [83, 27, 2], [85, 19], [86, 27, 2], [88, 19], [89, 27, 4],
+  [96, 27], [97, 29], [98, 30], [99, 31], [100, 27], [101, 29], [102, 31, 2], [104, 26], [106, 29], [108, 27, 4],
+  [112, 31], [114, 29], [116, 27], [118, 22], [120, 27, 6],
+];
+const MEL_ENT_BR = [
+  [0, 15, 2], [4, 19, 2], [8, 22, 2], [12, 24, 2],
+  [16, 22, 2], [20, 19, 2], [24, 15, 2],
+  [32, 14, 2], [36, 17, 2], [40, 22, 2], [44, 26, 2],
+  [48, 24, 4], [56, 22, 2], [60, 19, 2],
+];
+const ENT_ROOTS_A = [-9, -9, -14, -14, -9, -9, -14, -9];
+const ENT_STABS_A = [[15, 19, 22], [15, 19, 22], [10, 14, 17], [10, 14, 17], [15, 19, 22], [15, 19, 22], [10, 14, 17], [15, 19, 22]];
+
+const SONGS = {
+  furelise: {
+    bpm: 90, style: 'boombap', swing: 0.16, melVoice: 'keys', crackle: true,
+    sections: [
+      { name: 'intro', bars: 2, drums: 'light', roots: [-12] },
+      { name: 'verse', bars: 8, drums: 'full', mel: MEL_FE_A, roots: FE_ROOTS_A, stabs: FE_STABS_A },
+      { name: 'chorus', bars: 8, drums: 'max', mel: MEL_FE_A, roots: FE_ROOTS_A, stabs: FE_STABS_A },
+      { name: 'bridge', bars: 4, drums: 'light', mel: MEL_FE_BR, roots: [-12, -12, -17, -17] },
+      { name: 'chorus', bars: 8, drums: 'max', mel: MEL_FE_A, roots: FE_ROOTS_A, stabs: FE_STABS_A },
+      { name: 'outro', bars: 2, drums: 'light', roots: [-12] },
+    ],
+  },
+  mountainking: {
+    bpm: 140, style: 'trap', swing: 0, melVoice: 'lead', crackle: false,
+    sections: [
+      { name: 'intro', bars: 4, drums: 'light', roots: [-12], stabs: [[0, 3, 7]] },
+      { name: 'verse', bars: 8, drums: 'full', mel: MEL_MK_A, roots: MK_ROOTS_A, stabs: [[0, 3, 7]] },
+      { name: 'chorus', bars: 8, drums: 'max', mel: MEL_MK_A, transpose: 12, roots: MK_ROOTS_A, stabs: [[0, 3, 7]] },
+      { name: 'bridge', bars: 2, drums: 'light', mel: MEL_MK_HALF, roots: [-12] },
+      { name: 'chorus', bars: 8, drums: 'max', mel: MEL_MK_A, transpose: 12, roots: MK_ROOTS_A, stabs: [[0, 3, 7]] },
+      { name: 'outro', bars: 2, drums: 'light', roots: [-12] },
+    ],
+  },
+  entertainer: {
+    bpm: 92, style: 'oldschool', swing: 0.12, melVoice: 'keys', crackle: true,
+    sections: [
+      { name: 'intro', bars: 2, drums: 'light', roots: [-9] },
+      { name: 'verse', bars: 8, drums: 'full', mel: MEL_ENT_A, roots: ENT_ROOTS_A, stabs: ENT_STABS_A },
+      { name: 'chorus', bars: 8, drums: 'max', mel: MEL_ENT_A, roots: ENT_ROOTS_A, stabs: ENT_STABS_A },
+      { name: 'bridge', bars: 4, drums: 'light', mel: MEL_ENT_BR, roots: [-9, -14, -9, -14] },
+      { name: 'chorus', bars: 8, drums: 'max', mel: MEL_ENT_A, roots: ENT_ROOTS_A, stabs: ENT_STABS_A },
+      { name: 'outro', bars: 2, drums: 'light', roots: [-9] },
+    ],
+  },
+};
+
+function expandSong(cfg) {
+  const def = SONGS[cfg.song];
+  const beat = 60 / def.bpm;
+  const step = beat / 4;
+  const LEAD_IN = 1.4;
+  const swing = def.swing || 0;
+  const events = [], cands = [], sectionMarks = [];
+  let bar = 0;
+  const tOf = gs => LEAD_IN + (gs + (Math.round(gs) % 2 === 1 ? swing : 0)) * step;
+
+  for (const sec of def.sections) {
+    sectionMarks.push({ t: tOf(bar * 16), name: sec.name });
+    const base = bar * 16;
+    const tr = sec.transpose || 0;
+    if (sec.mel) {
+      for (const m of sec.mel) {
+        const s = m[0], semi = m[1] + tr, durSteps = m[2] || 2;
+        const t = tOf(base + s);
+        const dur = Math.max(step * 1.6, durSteps * step * 0.95);
+        events.push({ t, fn: def.melVoice, freq: F(semi), dur, v: def.melVoice === 'lead' ? 1.1 : 1 });
+        cands.push({ t, kind: 'mel', pitch: semi, si: s % 16 });
+      }
+    }
+    for (let b = 0; b < sec.bars; b++) {
+      const bs = base + b * 16;
+      const root = sec.roots ? sec.roots[b % sec.roots.length] : null;
+      const P = DRUM_KITS[def.style][sec.drums];
+      const full = sec.drums !== 'light';
+      if (P) {
+        for (const s of P.kick) {
+          events.push({ t: tOf(bs + s), fn: 'kick', v: 1 });
+          if (root !== null) events.push({ t: tOf(bs + s), fn: 'sub', freq: F(root), dur: step * 3.5, v: 1 });
+          if (full) cands.push({ t: tOf(bs + s), kind: 'kick', pitch: null, si: s });
+        }
+        for (const s of P.snare) {
+          events.push({ t: tOf(bs + s), fn: 'snare', v: 1 });
+          if (full) cands.push({ t: tOf(bs + s), kind: 'snare', pitch: null, si: s });
+        }
+        for (const s of P.hat) {
+          events.push({ t: tOf(bs + s), fn: 'hat', open: false, v: 1 });
+          if (sec.drums === 'max') cands.push({ t: tOf(bs + s), kind: 'tick', pitch: null, si: s });
+        }
+        for (const s of P.ohat) events.push({ t: tOf(bs + s), fn: 'hat', open: true, v: 1 });
+      }
+      if (sec.stabs) {
+        const ch = sec.stabs[b % sec.stabs.length];
+        if (def.style === 'trap') {
+          events.push({ t: tOf(bs), fn: 'pad', freqs: ch.map(s => F(s)), dur: 16 * step, v: 0.85 });
+        } else {
+          for (const s of [0, 10]) {
+            for (const cs of ch) events.push({ t: tOf(bs + s), fn: 'keys', freq: F(cs), dur: step * 2.2, v: 0.34 });
+          }
+        }
+      }
+    }
+    bar += sec.bars;
+  }
+
+  events.sort((a, b) => a.t - b.t);
+  cands.sort((a, b) => a.t - b.t);
+  return {
+    bpm: def.bpm, beat, step, leadIn: LEAD_IN,
+    duration: LEAD_IN + bar * 16 * step,
+    events, cands, sectionMarks, crackle: !!def.crackle,
+  };
+}
+
+function buildTrack(cfg) {
+  return cfg.song ? expandSong(cfg) : composeTrack(cfg);
+}
+
 // ============================================================ tracks
 const TRACKS = [
-  { id: 'neon', name: 'NEON RUNNER', bpm: 122, seed: 'pf-neon-runner-v1', style: 'drive', color: '#4df3ff' },
-  { id: 'midnight', name: 'MIDNIGHT DRIVE', bpm: 100, seed: 'pf-midnight-drive-v1', style: 'chill', color: '#b44dff' },
-  { id: 'overdrive', name: 'OVERDRIVE', bpm: 146, seed: 'pf-overdrive-v1', style: 'intense', color: '#ff4da6' },
+  { id: 'furelise', name: 'FÜR ELISE', bpm: 90, seed: 'pf-furelise-v1', song: 'furelise', tag: 'BOOM BAP · 1810', color: '#ffd166' },
+  { id: 'mountainking', name: 'MOUNTAIN KING', bpm: 140, seed: 'pf-mountainking-v1', song: 'mountainking', tag: 'TRAP · 1875', color: '#ff4da6' },
+  { id: 'entertainer', name: 'THE ENTERTAINER', bpm: 92, seed: 'pf-entertainer-v1', song: 'entertainer', tag: 'OLD SCHOOL · 1902', color: '#4df3ff' },
+  { id: 'neon', name: 'NEON RUNNER', bpm: 122, seed: 'pf-neon-runner-v1', style: 'drive', tag: 'SYNTHWAVE', color: '#b44dff' },
+  { id: 'midnight', name: 'MIDNIGHT DRIVE', bpm: 100, seed: 'pf-midnight-drive-v1', style: 'chill', tag: 'SYNTHWAVE', color: '#4df3ff' },
+  { id: 'overdrive', name: 'OVERDRIVE', bpm: 146, seed: 'pf-overdrive-v1', style: 'intense', tag: 'SYNTHWAVE', color: '#ff4da6' },
 ];
 
 function dailyTrack() {
@@ -582,7 +823,7 @@ function buildMenu() {
     const best = getBest(tr, S.diff);
     card.innerHTML =
       `<div class="t-name">${tr.name}</div>` +
-      `<div class="t-meta">${tr.bpm} BPM${tr.daily ? ' · ' + tr.date.slice(5) : ''}</div>` +
+      `<div class="t-meta">${tr.bpm} BPM${tr.tag ? ' · ' + tr.tag : ''}${tr.daily ? ' · ' + tr.date.slice(5) : ''}</div>` +
       (best ? `<div class="t-best">${best.grade}</div>` : '') +
       `<div class="t-bars">${bars}</div>`;
     card.addEventListener('click', () => { S.selTrack = i; buildMenu(); });
@@ -600,8 +841,9 @@ function buildMenu() {
 function startGame() {
   const trackCfg = allTracks()[S.selTrack];
   S.trackCfg = trackCfg;
-  S.track = composeTrack(trackCfg);
+  S.track = buildTrack(trackCfg);
   S.notes = makeBeatmap(S.track, S.diff, trackCfg.seed);
+  if (S.crackleSrc) { AC.crackleStop(S.crackleSrc); S.crackleSrc = null; }
   S.counts = [0, 0, 0, 0];
   S.combo = 0; S.maxCombo = 0; S.score = 0;
   S.accNum = 0; S.accDen = 0;
@@ -629,10 +871,12 @@ function startGame() {
       S.audioMode = AC.running();
       if (S.audioMode) {
         S.songStart = AC.ctx.currentTime + 0.12;
+        if (S.track.crackle && !S.crackleSrc) S.crackleSrc = AC.crackleStart();
       }
     });
     S.audioMode = AC.running();
     S.songStart = AC.ctx ? AC.ctx.currentTime + 0.12 : 0;
+    if (S.audioMode && S.track.crackle && !S.crackleSrc) S.crackleSrc = AC.crackleStart();
   } else {
     S.audioMode = false;
   }
@@ -652,6 +896,8 @@ function schedule() {
       case 'snare': AC.snare(when, e.v); break;
       case 'hat': AC.hat(when, e.open, e.v); break;
       case 'bass': AC.bass(when, e.freq, e.dur, e.v); break;
+      case 'sub': AC.sub(when, e.freq, e.dur, e.v); break;
+      case 'keys': AC.keys(when, e.freq, e.dur, e.v); break;
       case 'lead': AC.lead(when, e.freq, e.dur, e.v); break;
       case 'arp': AC.arp(when, e.freq, e.v); break;
       case 'pad': AC.pad(when, e.freqs, e.dur, e.v); break;
@@ -702,6 +948,7 @@ function handleLane(lane) {
 
 function finishSong() {
   S.mode = 'results';
+  if (S.crackleSrc) { AC.crackleStop(S.crackleSrc); S.crackleSrc = null; }
   const acc = S.accDen ? S.accNum / S.accDen : 0;
   const grade = S.counts[3] === 0 && acc >= 0.97 ? 'SS'
     : acc >= 0.95 ? 'S' : acc >= 0.9 ? 'A' : acc >= 0.8 ? 'B' : acc >= 0.7 ? 'C' : 'D';
@@ -742,6 +989,7 @@ function resumeGame() {
 
 function quitToMenu() {
   S.mode = 'menu';
+  if (S.crackleSrc) { AC.crackleStop(S.crackleSrc); S.crackleSrc = null; }
   if (AC.ctx) { AC.ctx.resume(); AC.duck(); }
   el.pause.classList.add('hidden');
   el.results.classList.add('hidden');
@@ -1199,7 +1447,7 @@ window.__PF = {
   hit(lane) { handleLane(lane); },
   compose(i, diff) {
     const cfg = allTracks()[i];
-    const tr = composeTrack(cfg);
+    const tr = buildTrack(cfg);
     const bm = makeBeatmap(tr, diff || S.diff, cfg.seed);
     return { events: tr.events.length, notes: bm.length, duration: Math.round(tr.duration * 10) / 10, bpm: tr.bpm };
   },

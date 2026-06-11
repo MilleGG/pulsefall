@@ -17,6 +17,18 @@ A 4-lane rhythm game with no audio files. The music — synthwave kicks, snares,
 
 ## Tracks
 
+**The Classics — public-domain bangers, hip-hop arrangements:**
+
+| Track | BPM | Style | Composer |
+|---|---|---|---|
+| Für Elise | 90 | boom bap + vinyl crackle | Beethoven, 1810 |
+| Mountain King | 140 | trap | Grieg, 1875 |
+| The Entertainer | 92 | old school swing | Scott Joplin, 1902 |
+
+Every classic is an **original arrangement of a public-domain composition** — melodies transcribed from scores whose composers died over a century ago, drums and 808s composed in-house, zero recordings sampled. Fully legal, instantly recognizable.
+
+**The Synthetics — procedurally composed:**
+
 | Track | BPM | Mood |
 |---|---|---|
 | Neon Runner | 122 | classic drive |
